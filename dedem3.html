@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Träna De/Dem</title>
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #e0f2fe, #fef9c3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .container {
+    display: flex;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+  }
+
+  button {
+    font-size: 3em;
+    padding: 60px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 0 #999;
+  }
+
+  button:active {
+    transform: translateY(6px);
+    box-shadow: 0 4px 0 #777;
+  }
+
+  #de-btn {
+    background: #fff;
+    color: #333;
+    border: 6px solid #8bc34a;
+  }
+
+  #dem-btn {
+    background: #fff;
+    color: #333;
+    border: 6px solid #f44336;
+  }
+
+  .correct {
+    background: #8bc34a !important;
+    color: white;
+  }
+
+  .wrong {
+    background: #f44336 !important;
+    color: white;
+  }
+
+  .word-box {
+    text-align: center;
+    width: 600px;
+  }
+
+  #word {
+    display: block;
+    font-size: 3em;
+    min-height: 150px;
+    padding: 40px;
+    border: 5px solid #ccc;
+    border-radius: 25px;
+    background: white;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+    transition: transform 0.6s ease;
+  }
+
+  #word.spin {
+    transform: rotateX(360deg);
+  }
+
+  #generate {
+    background: #2196f3;
+    color: white;
+    font-size: 2em;
+    padding: 20px 50px;
+    border-radius: 20px;
+    cursor: pointer;
+    border: none;
+    transition: 0.3s;
+  }
+
+  #generate:hover {
+    background: #1976d2;
+  }
+
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="buttons">
+    <button id="de-btn">De</button>
+    <button id="dem-btn">Dem</button>
+  </div>
+  <div class="word-box">
+    <span id="word">Tryck på "Generera"</span><br>
+    <button id="generate">Generera</button>
+  </div>
+</div>
+
+<script>
+  const deBtn = document.getElementById('de-btn');
+  const demBtn = document.getElementById('dem-btn');
+  const wordDisplay = document.getElementById('word');
+  const generateBtn = document.getElementById('generate');
+
+  // Ordlistor för att bygga korrekta meningar
+  const verbsDe = ["springer till skolan", "äter glass", "sover i tältet", "skrattar högt", "sjunger i kör", "spelar fotboll", "bygger sandslott", "dansar på scenen", "läser böcker", "skriver berättelser"];
+  const verbsDem = ["såg", "hörde", "hälsade på", "väntade på", "pratade med", "träffade", "hjälpte", "saknade", "undervisade", "följde"];
+  const nouns = ["barnen", "eleverna", "katten", "läraren", "fotbollslaget", "vännerna", "mormor", "grannen", "klassen", "föräldrarna"];
+  const places = ["på skolgården", "hemma", "i parken", "vid sjön", "på bion", "på lektionen", "i matsalen"];
+
+  let current = null;
+
+  function randomItem(list) {
+    return list[Math.floor(Math.random() * list.length)];
+  }
+
+  function generateSentence() {
+    const type = Math.random() < 0.5 ? "de" : "dem";
+    let sentence;
+
+    if (type === "de") {
+      // Subjekt: "___ gör något"
+      sentence = `___ ${randomItem(verbsDe)}.`;
+    } else {
+      // Objekt: "Någon gör något mot ___"
+      const subject = randomItem(nouns);
+      const verb = randomItem(verbsDem);
+      const place = Math.random() < 0.5 ? ` ${randomItem(places)}` : "";
+      sentence = `${subject} ${verb} ___${place}.`;
+    }
+
+    return { phrase: sentence, correct: type };
+  }
+
+  generateBtn.addEventListener('click', () => {
+    const random = generateSentence();
+    current = random;
+
+    // Animation: snurra texten
+    wordDisplay.classList.add("spin");
+    setTimeout(() => {
+      wordDisplay.textContent = random.phrase;
+      wordDisplay.classList.remove("spin");
+      deBtn.className = "";
+      demBtn.className = "";
+    }, 300);
+  });
+
+  function checkAnswer(answer) {
+    if (!current) return;
+    const correct = current.correct === answer;
+    if (answer === "de") {
+      deBtn.className = correct ? "correct" : "wrong";
+      demBtn.className = "";
+    } else {
+      demBtn.className = correct ? "correct" : "wrong";
+      deBtn.className = "";
+    }
+  }
+
+  deBtn.addEventListener('click', () => checkAnswer("de"));
+  demBtn.addEventListener('click', () => checkAnswer("dem"));
+</script>
+</body>
+</html>
